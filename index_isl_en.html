@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Íslensk Nöfn — Heimur Hringadróttinsins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f5f0;
+      --surface: #ffffff;
+      --border: #e2ddd6;
+      --text: #1a1714;
+      --muted: #7a7068;
+      --accent: #3d6b4f;
+      --accent-light: #eef4f0;
+      --tag-bg: #f0ece6;
+      --shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 2.5rem 2rem 2rem;
+    }
+    .header-inner { max-width: 900px; margin: 0 auto; }
+    .site-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    header h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    header h1 em { font-style: italic; color: var(--accent); }
+    header p { margin-top: 0.6rem; color: var(--muted); font-size: 0.9rem; max-width: 520px; }
+
+    .controls {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-wrap { flex: 1; min-width: 220px; position: relative; }
+    .search-wrap svg {
+      position: absolute; left: 0.85rem; top: 50%;
+      transform: translateY(-50%); color: var(--muted); pointer-events: none;
+    }
+    input[type="search"] {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input[type="search"]:focus { border-color: var(--accent); }
+    input[type="search"]::placeholder { color: var(--muted); }
+
+    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 0.82rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .stats { max-width: 900px; margin: 0 auto 1rem; padding: 0 2rem; font-size: 0.8rem; color: var(--muted); }
+
+    .table-wrap { max-width: 900px; margin: 0 auto 4rem; padding: 0 2rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    thead th {
+      text-align: left;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { color: var(--accent); }
+    thead th .sort-icon { opacity: 0.4; margin-left: 4px; }
+    thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--accent-light); }
+
+    td { padding: 0.9rem 1.1rem; vertical-align: top; }
+    .name-en { font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; }
+    .name-is { font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; color: var(--accent); }
+    .race-tag {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      background: var(--tag-bg);
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .etymology { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+
+    tr.detail-row { background: var(--accent-light); }
+    tr.detail-row td {
+      padding: 0.5rem 1.1rem 1rem 2.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    tr.detail-row .lore {
+      border-left: 2px solid var(--accent);
+      padding-left: 0.85rem;
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    .expand-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); padding: 0 0.3rem;
+      font-size: 1rem; line-height: 1;
+      transition: transform 0.2s, color 0.15s;
+    }
+    .expand-btn:hover { color: var(--accent); }
+    .expand-btn.open { transform: rotate(90deg); color: var(--accent); }
+
+    /* Loading / error states */
+    .status-box {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 1rem;
+    }
+    .status-box.error { color: #c0392b; font-style: normal; font-size: 0.9rem; line-height: 1.7; }
+    .status-box code {
+      display: inline-block;
+      background: var(--tag-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-style: normal;
+      font-size: 0.85rem;
+    }
+
+    .empty { text-align: center; padding: 4rem 2rem; color: var(--muted); font-family: 'Lora', serif; font-style: italic; }
+
+    footer { text-align: center; padding: 2rem; font-size: 0.78rem; color: var(--muted); border-top: 1px solid var(--border); }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── Language toggle ── */
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+    .lang-toggle button {
+      padding: 0.55rem 0.9rem;
+      background: var(--surface);
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .lang-toggle button.active { background: var(--accent); color: #fff; }
+    .lang-toggle button:not(.active):hover { color: var(--accent); background: var(--accent-light); }
+    .lang-toggle .divider { width: 1px; align-self: stretch; background: var(--border); }
+
+    @media (max-width: 600px) { .col-race, .col-etymology { display: none; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="site-eyebrow">Íslenskar þýðingar · Icelandic Translations</div>
+    <h1>Nöfn úr <em>Heim Hringjadróttinssögu</em></h1>
+    <p>A reference for Icelandic translations of names from Tolkien's legendarium — with origins, lore notes, and etymology.</p>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="search" id="searchInput" placeholder="Search names…" autocomplete="off">
+  </div>
+  <div class="lang-toggle">
+    <button id="langIs" class="active" title="Íslenska">IS</button>
+    <div class="divider"></div>
+    <button id="langEn" title="English">EN</button>
+  </div>
+  <div class="filter-group" id="filters"></div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="table-wrap">
+  <div id="statusBox" class="status-box">Loading names…</div>
+  <table id="namesTable" style="display:none">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="col-en" data-col="english">English Name <span class="sort-icon">↕</span></th>
+        <th class="col-is" data-col="icelandic">Icelandic Name <span class="sort-icon">↕</span></th>
+        <th class="col-race" data-col="race">Race <span class="sort-icon">↕</span></th>
+        <th class="col-etymology">Etymology / Notes</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="empty" id="emptyState" style="display:none">Ekkert fannst — No names found.</div>
+</div>
+
+<footer>
+  Data compiled from Tolkien's works. This is a fan reference site. &nbsp;·&nbsp;
+  <a href="https://github.com/" target="_blank">View on GitHub</a>
+</footer>
+
+<script>
+// ── CSV parser (handles quoted fields with commas inside) ──
+function parseCSV(text) {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const headers = parseLine(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = parseLine(lines[i]);
+    const obj = {};
+    headers.forEach((h, idx) => obj[h.trim().toLowerCase()] = (vals[idx] || '').trim());
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function parseLine(line) {
+  const fields = [];
+  let cur = '', inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (c === ',' && !inQuotes) {
+      fields.push(cur); cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  fields.push(cur);
+  return fields;
+}
+
+// ── Language strings ──
+const ui = {
+  is: {
+    eyebrow:      'Íslenskar þýðingar · Icelandic Translations',
+    h1:           'Nöfn úr <em>Heim Hringjadróttinssögu</em>',
+    subtitle:     'Íslenskar þýðingar á nöfnum úr heimi Tolkiens — með uppruna, þáttasögur og orðsifjafræði.',
+    search:       'Leita að nafni…',
+    filters:      ['Öll', 'Hobbitar', 'Menn', 'Álfar', 'Dvergar', 'Galdramenn', 'Annað'],
+    colEn:        'Enska nafn',
+    colIs:        'Íslenska nafn',
+    colRace:      'Kyn',
+    colEty:       'Orðsifjafræði / Skýringar',
+    empty:        'Ekkert fannst — No names found.',
+    showing:      (n, t) => `Sýni ${n} af ${t} nöfnum`,
+  },
+  en: {
+    eyebrow:      'Icelandic Translations · Íslenskar þýðingar',
+    h1:           'Names from <em>The Lord of the Rings</em>',
+    subtitle:     'Icelandic translations of names from Tolkien\'s legendarium — with origins, lore notes, and etymology.',
+    search:       'Search names…',
+    filters:      ['All', 'Hobbits', 'Men', 'Elves', 'Dwarves', 'Wizards', 'Other'],
+    colEn:        'English Name',
+    colIs:        'Icelandic Name',
+    colRace:      'Race',
+    colEty:       'Etymology / Notes',
+    empty:        'No names found — Ekkert fannst.',
+    showing:      (n, t) => `Showing ${n} of ${t} names`,
+  }
+};
+
+const raceValues = ['all', 'Hobbit', 'Man', 'Elf', 'Dwarf', 'Wizard', 'Other'];
+
+// ── App state ──
+let allNames = [];
+let currentRace = 'all';
+let currentSort = { col: 'english', dir: 1 };
+let expandedRows = new Set();
+let lang = 'is';
+
+const tbody       = document.getElementById('tableBody');
+const searchInput = document.getElementById('searchInput');
+const emptyState  = document.getElementById('emptyState');
+const statsEl     = document.getElementById('stats');
+const statusBox   = document.getElementById('statusBox');
+const table       = document.getElementById('namesTable');
+
+function applyLang() {
+  const t = ui[lang];
+  document.querySelector('.site-eyebrow').textContent = t.eyebrow;
+  document.querySelector('header h1').innerHTML = t.h1;
+  document.querySelector('header p').textContent = t.subtitle;
+  searchInput.placeholder = t.search;
+  // Filter buttons
+  const btns = document.querySelectorAll('#filters .filter-btn');
+  btns.forEach((b, i) => b.textContent = t.filters[i]);
+  // Table headers
+  document.querySelector('.col-en').childNodes[0].textContent = t.colEn + ' ';
+  document.querySelector('.col-is').childNodes[0].textContent = t.colIs + ' ';
+  document.querySelector('.col-race').childNodes[0].textContent = t.colRace + ' ';
+  document.querySelector('.col-etymology').childNodes[0].textContent = t.colEty;
+  emptyState.textContent = t.empty;
+  // Lang buttons
+  document.getElementById('langIs').classList.toggle('active', lang === 'is');
+  document.getElementById('langEn').classList.toggle('active', lang === 'en');
+  render();
+}
+
+document.getElementById('langIs').addEventListener('click', () => { lang = 'is'; applyLang(); });
+document.getElementById('langEn').addEventListener('click', () => { lang = 'en'; applyLang(); });
+
+// ── Load CSV ──
+fetch('names.csv')
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.text();
+  })
+  .then(text => {
+    allNames = parseCSV(text).filter(n => n.english);
+    // Build filter buttons dynamically
+    const filtersEl = document.getElementById('filters');
+    filtersEl.innerHTML = '';
+    raceValues.forEach((race, i) => {
+      const b = document.createElement('button');
+      b.className = 'filter-btn' + (race === 'all' ? ' active' : '');
+      b.dataset.race = race;
+      b.textContent = ui[lang].filters[i];
+      filtersEl.appendChild(b);
+    });
+    statusBox.style.display = 'none';
+    table.style.display = '';
+    render();
+  })
+  .catch(err => {
+    statusBox.className = 'status-box error';
+    statusBox.innerHTML = `
+      <strong>Could not load names.csv</strong><br><br>
+      Make sure <code>names.csv</code> is in the same folder as <code>index.html</code>.<br>
+      If you're developing locally, open with Live Server in VSCodium rather than opening the file directly.<br><br>
+      <em>Error: ${err.message}</em>
+    `;
+  });
+
+// ── Render ──
+function render() {
+  const q = searchInput.value.toLowerCase().trim();
+  let data = allNames.filter(n => {
+    const matchRace   = currentRace === 'all' || n.race === currentRace;
+    const matchSearch = !q ||
+      (n.english    || '').toLowerCase().includes(q) ||
+      (n.icelandic  || '').toLowerCase().includes(q) ||
+      (n.etymology  || '').toLowerCase().includes(q);
+    return matchRace && matchSearch;
+  });
+
+  data.sort((a, b) => {
+    const av = (a[currentSort.col] || '').toLowerCase();
+    const bv = (b[currentSort.col] || '').toLowerCase();
+    return av < bv ? -currentSort.dir : av > bv ? currentSort.dir : 0;
+  });
+
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    emptyState.style.display = 'block';
+    statsEl.textContent = '';
+    return;
+  }
+  emptyState.style.display = 'none';
+  statsEl.textContent = ui[lang].showing(data.length, allNames.length);
+
+  data.forEach(n => {
+    const id     = (n.english || '').replace(/\s/g, '_');
+    const isOpen = expandedRows.has(id);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="width:30px;padding-right:0">
+        <button class="expand-btn ${isOpen ? 'open' : ''}" data-id="${id}" title="Show lore note">›</button>
+      </td>
+      <td><span class="name-en">${n.english || ''}</span></td>
+      <td><span class="name-is">${n.icelandic || ''}</span></td>
+      <td class="col-race"><span class="race-tag">${n.race || ''}</span></td>
+      <td class="col-etymology"><span class="etymology">${n.etymology || ''}</span></td>
+    `;
+    tbody.appendChild(tr);
+
+    if (isOpen && n.lore) {
+      const dr = document.createElement('tr');
+      dr.className = 'detail-row';
+      dr.innerHTML = `<td></td><td colspan="4"><div class="lore">${n.lore}</div></td>`;
+      tbody.appendChild(dr);
+    }
+  });
+
+  tbody.querySelectorAll('.expand-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      if (expandedRows.has(id)) expandedRows.delete(id);
+      else expandedRows.add(id);
+      render();
+    });
+  });
+}
+
+// ── Sort headers ──
+document.querySelectorAll('thead th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (currentSort.col === col) currentSort.dir *= -1;
+    else { currentSort.col = col; currentSort.dir = 1; }
+    document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    th.querySelector('.sort-icon').textContent = currentSort.dir === 1 ? '↑' : '↓';
+    render();
+  });
+});
+
+// ── Filters ──
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRace = btn.dataset.race;
+  render();
+});
+
+searchInput.addEventListener('input', render);
+</script>
+</body>
+</html>
